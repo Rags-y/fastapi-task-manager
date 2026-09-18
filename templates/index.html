@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <div class="logo-icon">✓</div>
+
+                <div>
+                    <h2>TaskFlow</h2>
+                    <span>Task Manager</span>
+                </div>
+            </div>
+
+            <nav>
+    <a href="#" class="nav-item active">
+        <span>▦</span>
+        Dashboard
+    </a>
+
+    <a href="#create-task" class="nav-item">
+        <span>＋</span>
+        Create Task
+    </a>
+
+    <a
+        href="/docs"
+        class="nav-item"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        <span>⌘</span>
+        API Docs
+    </a>
+</nav>
+
+            <div class="sidebar-footer">
+                <p>Powered by</p>
+                <strong>FastAPI</strong>
+            </div>
+
+        </aside>
+
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Header -->
+            <header class="topbar">
+
+                <div>
+                    <p class="eyebrow">TASK MANAGEMENT</p>
+
+                    <h1>Dashboard</h1>
+
+                    <p class="subtitle">
+                        Manage and track your tasks from one place.
+                    </p>
+                </div>
+
+                <button class="refresh-btn" onclick="loadTasks()">
+                    ↻ Refresh
+                </button>
+
+            </header>
+
+
+            <!-- Statistics -->
+            <section class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon total">
+                        ▦
+                    </div>
+
+                    <div>
+                        <span>Total Tasks</span>
+                        <h2 id="total-count">0</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon pending">
+                        ◷
+                    </div>
+
+                    <div>
+                        <span>Pending</span>
+                        <h2 id="pending-count">0</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon progress">
+                        ↗
+                    </div>
+
+                    <div>
+                        <span>In Progress</span>
+                        <h2 id="progress-count">0</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon completed">
+                        ✓
+                    </div>
+
+                    <div>
+                        <span>Completed</span>
+                        <h2 id="completed-count">0</h2>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Create Task -->
+            <section class="panel" id="create-task">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Create New Task</h2>
+
+                        <p>
+                            Add a new task to your workspace.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <form id="task-form">
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label for="title">
+                                Task Title
+                            </label>
+
+                            <input
+                                type="text"
+                                id="title"
+                                placeholder="e.g. Learn FastAPI"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="priority">
+                                Priority
+                            </label>
+
+                            <select id="priority" required>
+
+                                <option value="low">
+                                    Low
+                                </option>
+
+                                <option value="medium" selected>
+                                    Medium
+                                </option>
+
+                                <option value="high">
+                                    High
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="description">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            rows="3"
+                            placeholder="Describe the task..."
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label for="status">
+                                Status
+                            </label>
+
+                            <select id="status">
+
+                                <option value="pending" selected>
+                                    Pending
+                                </option>
+
+                                <option value="in-progress">
+                                    In Progress
+                                </option>
+
+                                <option value="completed">
+                                    Completed
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-actions">
+
+                            <button
+                                type="submit"
+                                class="primary-btn"
+                            >
+                                + Create Task
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+
+                <div id="form-message"></div>
+
+            </section>
+
+
+            <!-- Tasks -->
+            <section class="panel">
+
+                <div class="panel-header task-header">
+
+                    <div>
+
+                        <h2>Tasks</h2>
+
+                        <p>
+                            View, search, filter and manage your tasks.
+                        </p>
+
+                    </div>
+
+
+                    <div class="task-controls">
+
+                        <input
+                            type="text"
+                            id="search-input"
+                            placeholder="Search tasks..."
+                            oninput="searchTasks()"
+                        >
+
+
+                        <select
+                            id="status-filter"
+                            onchange="filterTasks()"
+                        >
+
+                            <option value="">
+                                All Status
+                            </option>
+
+                            <option value="pending">
+                                Pending
+                            </option>
+
+                            <option value="in-progress">
+                                In Progress
+                            </option>
+
+                            <option value="completed">
+                                Completed
+                            </option>
+
+                        </select>
+
+
+                        <select
+                            id="priority-filter"
+                            onchange="filterTasks()"
+                        >
+
+                            <option value="">
+                                All Priority
+                            </option>
+
+                            <option value="low">
+                                Low
+                            </option>
+
+                            <option value="medium">
+                                Medium
+                            </option>
+
+                            <option value="high">
+                                High
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="tasks-container"
+                    class="tasks-container"
+                >
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ▦
+                        </div>
+
+                        <h3>
+                            No tasks yet
+                        </h3>
+
+                        <p>
+                            Create your first task to get started.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- Edit Task Modal -->
+    <div
+        id="edit-modal"
+        class="modal"
+    >
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h2>
+                        Edit Task
+                    </h2>
+
+                    <p>
+                        Update the task details below.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    onclick="closeEditModal()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form id="edit-form">
+
+                <input
+                    type="hidden"
+                    id="edit-task-id"
+                >
+
+
+                <div class="form-group">
+
+                    <label for="edit-title">
+                        Task Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="edit-title"
+                        placeholder="Task title"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="edit-description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="edit-description"
+                        rows="4"
+                        placeholder="Task description"
+                        required
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="edit-priority">
+                            Priority
+                        </label>
+
+                        <select
+                            id="edit-priority"
+                            required
+                        >
+
+                            <option value="low">
+                                Low
+                            </option>
+
+                            <option value="medium">
+                                Medium
+                            </option>
+
+                            <option value="high">
+                                High
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="edit-status">
+                            Status
+                        </label>
+
+                        <select
+                            id="edit-status"
+                            required
+                        >
+
+                            <option value="pending">
+                                Pending
+                            </option>
+
+                            <option value="in-progress">
+                                In Progress
+                            </option>
+
+                            <option value="completed">
+                                Completed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        onclick="closeEditModal()"
+                    >
+                        Cancel
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- JavaScript -->
+    <script src="/static/script.js"></script>
+
+</body>
+</html>
